@@ -1,0 +1,5 @@
+{
+  "name": "Max Podcast",
+  "description": "Um tocador de podcast personalizado para publicação de áudios e recebimento de doações via PIX.",
+  "requestFramePermissions": []
+}
