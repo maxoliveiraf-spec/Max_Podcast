@@ -19,9 +19,21 @@ export const AdminPanel: React.FC = () => {
     if (!auth.currentUser) return;
 
     setLoading(true);
+    
+    let finalAudioUrl = form.audioUrl;
+
+    // Auto-convert Google Drive links to direct stream links
+    if (finalAudioUrl.includes('drive.google.com')) {
+      const driveIdMatch = finalAudioUrl.match(/\/d\/(.+?)\//) || finalAudioUrl.match(/id=(.+?)(&|$)/);
+      if (driveIdMatch && driveIdMatch[1]) {
+        finalAudioUrl = `https://drive.google.com/uc?export=download&id=${driveIdMatch[1]}`;
+      }
+    }
+
     try {
       await addDoc(collection(db, 'episodes'), {
         ...form,
+        audioUrl: finalAudioUrl,
         duration: Number(form.duration) || 0,
         createdAt: serverTimestamp(),
         authorId: auth.currentUser.uid
@@ -30,6 +42,7 @@ export const AdminPanel: React.FC = () => {
       setIsOpen(false);
     } catch (error) {
       console.error("Error adding episode:", error);
+      alert("Erro ao publicar. Verifique se o link está correto.");
     } finally {
       setLoading(false);
     }
