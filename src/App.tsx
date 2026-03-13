@@ -131,7 +131,7 @@ export default function App() {
                 <div className="flex items-center gap-3">
                   <div className="text-right hidden sm:block">
                     <p className="text-white text-xs font-bold">{user.displayName}</p>
-                    <p className="text-zinc-500 text-[10px]">{isAdmin ? 'Administrador' : 'Ouvinte'}</p>
+                    <span className="text-zinc-500 text-[10px] block">{isAdmin ? 'Administrador' : 'Ouvinte'}</span>
                   </div>
                   <img src={user.photoURL || ''} alt="" className="w-8 h-8 rounded-full border border-zinc-700" />
                   <button 
@@ -147,7 +147,7 @@ export default function App() {
                   className="flex items-center gap-2 text-sm font-medium text-white bg-zinc-800 hover:bg-zinc-700 px-4 py-2 rounded-full transition-colors"
                 >
                   <LogIn size={18} />
-                  Entrar
+                  <span>Entrar</span>
                 </button>
               )}
             </div>

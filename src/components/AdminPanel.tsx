@@ -212,7 +212,12 @@ export const AdminPanel: React.FC = () => {
 
       <AnimatePresence>
         {isOpen && (
-          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto"
+          >
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -221,7 +226,7 @@ export const AdminPanel: React.FC = () => {
             >
               <div className="p-6 border-b border-zinc-800 flex items-center justify-between sticky top-0 bg-zinc-900 z-10">
                 <h3 className="text-xl font-bold text-white">
-                  {editingId ? 'Editar Episódio' : 'Gerenciar Episódios'}
+                  <span>{editingId ? 'Editar Episódio' : 'Gerenciar Episódios'}</span>
                 </h3>
                 <button onClick={() => setIsOpen(false)} className="text-zinc-500 hover:text-white">
                   <X size={24} />
@@ -233,7 +238,7 @@ export const AdminPanel: React.FC = () => {
                 <div className="p-6 border-r border-zinc-800">
                   <form onSubmit={handleSubmit} className="space-y-4">
                     <h4 className="text-sm font-bold text-emerald-500 uppercase tracking-wider mb-4">
-                      {editingId ? 'Atualizar Dados' : 'Novo Episódio'}
+                      <span>{editingId ? 'Atualizar Dados' : 'Novo Episódio'}</span>
                     </h4>
                     
                     <div>
@@ -296,10 +301,10 @@ export const AdminPanel: React.FC = () => {
                         type="submit"
                         className="flex-1 bg-white text-black font-bold py-3 rounded-xl hover:bg-zinc-200 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
                       >
-                        {loading ? 'Processando...' : (
+                        {loading ? <span>Processando...</span> : (
                           <>
                             {editingId ? <Check size={18} /> : <Upload size={18} />}
-                            {editingId ? 'Salvar Alterações' : 'Publicar'}
+                            <span>{editingId ? 'Salvar Alterações' : 'Publicar'}</span>
                           </>
                         )}
                       </button>
@@ -353,7 +358,7 @@ export const AdminPanel: React.FC = () => {
                 </div>
               </div>
             </motion.div>
-          </div>
+          </motion.div>
         )}
       </AnimatePresence>
     </>

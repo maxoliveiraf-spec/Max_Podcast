@@ -52,11 +52,11 @@ export const EpisodeCard: React.FC<EpisodeCardProps> = ({ episode }) => {
             <div className="flex items-center gap-3 text-[10px] font-medium text-zinc-500 uppercase tracking-widest">
               <span className="flex items-center gap-1">
                 <Calendar size={12} />
-                {episode.createdAt?.toDate ? format(episode.createdAt.toDate(), "dd 'de' MMM, yyyy", { locale: ptBR }) : 'Recent'}
+                <span>{episode.createdAt?.toDate ? format(episode.createdAt.toDate(), "dd 'de' MMM, yyyy", { locale: ptBR }) : 'Recent'}</span>
               </span>
               <span className="flex items-center gap-1">
                 <Clock size={12} />
-                {episode.duration ? `${Math.floor(episode.duration / 60)} min` : 'Podcast'}
+                <span>{episode.duration ? `${Math.floor(episode.duration / 60)} min` : 'Podcast'}</span>
               </span>
             </div>
             <button 
