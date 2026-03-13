@@ -34,6 +34,7 @@ export default function App() {
     });
 
     const authUnsubscribe = onAuthStateChanged(auth, (u) => {
+      console.log("Auth state changed:", u?.email, u?.emailVerified);
       setUser(u);
     });
 
@@ -57,6 +58,8 @@ export default function App() {
     ep.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const isAdmin = user?.email === 'maxoliveiraf@gmail.com';
+
   return (
     <AudioProvider>
       <div className="min-h-screen bg-black text-zinc-300 font-sans selection:bg-emerald-500/30">
@@ -73,6 +76,10 @@ export default function App() {
             <div className="flex items-center gap-4">
               {user ? (
                 <div className="flex items-center gap-3">
+                  <div className="text-right hidden sm:block">
+                    <p className="text-white text-xs font-bold">{user.displayName}</p>
+                    <p className="text-zinc-500 text-[10px]">{isAdmin ? 'Administrador' : 'Ouvinte'}</p>
+                  </div>
                   <img src={user.photoURL || ''} alt="" className="w-8 h-8 rounded-full border border-zinc-700" />
                   <button 
                     onClick={() => auth.signOut()}
@@ -147,8 +154,8 @@ export default function App() {
           <PixDonation />
         </main>
 
-        {/* Admin Panel (Visible to logged in users for now, can be restricted by email) */}
-        {user && <AdminPanel />}
+        {/* Admin Panel (Strictly restricted to admin email) */}
+        {isAdmin && <AdminPanel />}
 
         {/* Persistent Audio Player */}
         <AudioPlayer />
