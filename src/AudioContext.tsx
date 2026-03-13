@@ -23,6 +23,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   useEffect(() => {
     if (!audioRef.current) {
       audioRef.current = new Audio();
+      audioRef.current.preload = "auto";
       
       audioRef.current.addEventListener('timeupdate', () => {
         setProgress(audioRef.current?.currentTime || 0);
@@ -38,8 +39,14 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       });
 
       audioRef.current.addEventListener('error', (e) => {
-        console.error("Audio error:", e);
+        const error = (e.target as HTMLAudioElement).error;
+        console.error("Audio error details:", {
+          code: error?.code,
+          message: error?.message,
+          src: audioRef.current?.src
+        });
         setIsPlaying(false);
+        alert("Erro ao carregar o áudio. Verifique se o link é válido e público.");
       });
     }
 
@@ -51,28 +58,64 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
   }, []);
 
-  const playEpisode = (episode: Episode) => {
+  const getDirectUrl = (url: string) => {
+    if (url.includes('drive.google.com')) {
+      const driveIdMatch = url.match(/\/d\/(.+?)\//) || url.match(/id=(.+?)(&|$)/);
+      if (driveIdMatch && driveIdMatch[1]) {
+        // Using docs.google.com/uc?export=open&id= which is often better for streaming
+        return `https://docs.google.com/uc?export=open&id=${driveIdMatch[1]}`;
+      }
+    }
+    return url;
+  };
+
+  const playEpisode = async (episode: Episode) => {
     if (currentEpisode?.id === episode.id) {
       togglePlay();
       return;
     }
 
     if (audioRef.current) {
-      audioRef.current.src = episode.audioUrl;
-      audioRef.current.play();
-      setCurrentEpisode(episode);
-      setIsPlaying(true);
+      try {
+        if (!episode.audioUrl) {
+          throw new Error("Audio URL is missing");
+        }
+        
+        const directUrl = getDirectUrl(episode.audioUrl);
+        
+        audioRef.current.pause();
+        audioRef.current.src = directUrl;
+        audioRef.current.load();
+        
+        setCurrentEpisode(episode);
+        setIsPlaying(true);
+        
+        // Wait for a bit to ensure the browser has started loading the new source
+        // This can help with "no supported source" errors on rapid changes
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        await audioRef.current.play();
+      } catch (error) {
+        console.error("Playback failed:", error);
+        setIsPlaying(false);
+      }
     }
   };
 
-  const togglePlay = () => {
+  const togglePlay = async () => {
     if (audioRef.current && currentEpisode) {
-      if (isPlaying) {
-        audioRef.current.pause();
-      } else {
-        audioRef.current.play();
+      try {
+        if (isPlaying) {
+          audioRef.current.pause();
+          setIsPlaying(false);
+        } else {
+          setIsPlaying(true);
+          await audioRef.current.play();
+        }
+      } catch (error) {
+        console.error("Toggle play failed:", error);
+        setIsPlaying(false);
       }
-      setIsPlaying(!isPlaying);
     }
   };
 
